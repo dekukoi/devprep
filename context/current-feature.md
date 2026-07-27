@@ -1,18 +1,22 @@
 # Current Feature
+<!-- Feature name and short description -->
 
 Project Initialization & Setup — scaffold the Next.js 16 app and lay down the project's context/planning docs before feature work begins.
 
 ## Status
+<!-- Not Started | In Progress | Completed -->
 
 In Progress
 
 ## Goals
+<!-- Goals and requirements -->
 
 - Stand up a clean Next.js 16 (App Router, TypeScript, `src/` dir, Tailwind v4) foundation
 - Strip the `create-next-app` boilerplate down to a minimal starting point
 - Establish the `context/` planning docs (overview, architecture notes, coding standards, current feature)
 
 ## Notes
+<!-- Any extra notes -->
 
 - Next.js 16 / React 19, Turbopack is the default for `dev` and `build`.
 - Per `AGENTS.md`: this is a modified Next.js — consult `node_modules/next/dist/docs/` before writing framework code.

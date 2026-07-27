@@ -12,7 +12,7 @@
 
 This is the common workflow that we will use for every single feature/fix:
 
-1. **Document** - Document the feature in @context/current-feature.md.
+1. **Document** - Document the feature in @context/current-feature.md. (never delete the guiding comments in that file)
 2. **Branch** - Create new branch for feature, fix, etc
 3. **Implement** - Implement the feature/fix that I create in @context/current-feature.md
 4. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
