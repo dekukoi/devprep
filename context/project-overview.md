@@ -52,7 +52,9 @@ Job-seeking developers apply to multiple roles without a concrete, low-cost way 
 
 ### A. Skill Bank
 
-The persistent, structured store of a user's skills, experience, and certifications — the single source of truth for everything else in DevPrep. Can be bootstrapped by importing an existing CV (parsed once into entries).
+The persistent, structured store of a user's skills, experience, certifications, and projects — the single source of truth for everything else in DevPrep. Can be bootstrapped by importing an existing CV (parsed once into entries).
+
+**Projects** are a peer to Experience, not a sub-item of it: personal projects, open-source contributions, freelance work, hackathons, or anything spanning multiple roles can be logged as a Project with its own description and linked skills, optionally tied to the Experience it happened during. A user can rely on Experience bullets alone and never touch Projects — Projects exist for finer-grained curation and for work that doesn't belong to a single job.
 
 Skills belong to a **fixed taxonomy** (closed list per category) to keep gap matching exact and reliable:
 
@@ -68,7 +70,7 @@ Skills belong to a **fixed taxonomy** (closed list per category) to keep gap mat
 
 ### B. CVs
 
-Generated from the Skill Bank, each tailored to a specific job post (pulls the most relevant entries). Editable and versioned over time.
+Generated from a user's **Experience and Project** entries — not the Skill Bank's proficiency ratings directly — each tailored to a specific job post. When creating a CV, candidate Experience/Project entries are ranked by how well their linked skills match the job post's requirements; the user picks which ones populate the draft. The Skill Bank itself stays focused on tracking proficiency and feeding the deterministic gap-analysis engine (see Feature D). Editable and versioned over time.
 
 | Template     | Variants                         |
 | ------------ | -------------------------------- |
@@ -119,6 +121,7 @@ erDiagram
     USER ||--o{ SKILLBANKENTRY : owns
     USER ||--o{ EXPERIENCE : owns
     USER ||--o{ CERTIFICATION : owns
+    USER ||--o{ PROJECT : owns
     USER ||--o{ CV : owns
     USER ||--o{ JOBPOST : owns
     USER ||--o{ COMPARISON : owns
@@ -127,6 +130,8 @@ erDiagram
     SKILL ||--o{ JOBPOSTREQUIREMENT : required_by
     SKILL }o--o{ EXPERIENCE : linked_skills
     SKILL }o--o{ CERTIFICATION : linked_skills
+    SKILL }o--o{ PROJECT : linked_skills
+    EXPERIENCE |o--o{ PROJECT : may_include
     CVTEMPLATE ||--o{ CV : styles
     CV ||--o{ CVVERSION : has_versions
     CV }o--o| JOBPOST : tailored_for
@@ -185,6 +190,19 @@ erDiagram
         datetime expiryDate
         string credentialUrl
         string userId FK
+    }
+
+    PROJECT {
+        string id PK
+        string title
+        text description
+        string[] bullets
+        datetime startDate
+        datetime endDate
+        datetime createdAt
+        datetime updatedAt
+        string userId FK
+        string experienceId FK
     }
 
     CVTEMPLATE {
@@ -294,6 +312,7 @@ model User {
   skillBankEntries SkillBankEntry[]
   experiences      Experience[]
   certifications   Certification[]
+  projects         Project[]
   cvs              CV[]
   jobPosts         JobPost[]
   comparisons      Comparison[]
@@ -367,6 +386,7 @@ model Skill {
   jobRequirements JobPostRequirement[]
   experiences     Experience[]         @relation("ExperienceSkills")
   certifications  Certification[]      @relation("CertificationSkills")
+  projects        Project[]            @relation("ProjectSkills")
 
   @@unique([categoryId, name])
   @@index([categoryId])
@@ -404,8 +424,9 @@ model Experience {
   updatedAt DateTime  @updatedAt
 
   userId       String
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  linkedSkills Skill[] @relation("ExperienceSkills")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkedSkills Skill[]   @relation("ExperienceSkills")
+  projects     Project[] // projects that happened during this role (optional link)
 
   @@index([userId])
   @@map("experiences")
@@ -427,6 +448,29 @@ model Certification {
 
   @@index([userId])
   @@map("certifications")
+}
+
+// Peer to Experience, not a sub-item of it — covers personal/open-source/freelance/
+// hackathon/multi-role work as well as finer-grained curation within a single job.
+model Project {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  bullets     String[]  // accomplishment lines, same shape as Experience.bullets
+  startDate   DateTime?
+  endDate     DateTime? // null = ongoing / no end date
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experienceId String?     // optional — set when this project happened during a specific role
+  experience   Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  linkedSkills Skill[]     @relation("ProjectSkills")
+
+  @@index([userId])
+  @@index([experienceId])
+  @@map("projects")
 }
 
 // ============================================
@@ -854,6 +898,8 @@ devprep/
 │   │   ├── (dashboard)/
 │   │   │   ├── skill-bank/
 │   │   │   │   └── [category]/
+│   │   │   ├── experience/
+│   │   │   ├── projects/
 │   │   │   ├── job-posts/
 │   │   │   │   └── [id]/
 │   │   │   ├── cvs/
@@ -863,6 +909,8 @@ devprep/
 │   │   │   └── settings/
 │   │   ├── api/
 │   │   │   ├── skill-bank/
+│   │   │   ├── experience/
+│   │   │   ├── projects/
 │   │   │   ├── job-posts/
 │   │   │   ├── cvs/
 │   │   │   ├── comparisons/
@@ -909,10 +957,10 @@ devprep/
 4. [ ] Create database migrations for initial schema
 5. [ ] Seed fixed taxonomy (categories + skills) and CV templates
 6. [ ] Build core UI components with shadcn/ui
-7. [ ] Implement Skill Bank CRUD (skills, experience, certifications)
+7. [ ] Implement Skill Bank CRUD (skills, experience, certifications, projects)
 8. [ ] Implement Job Posts CRUD (paste + structured requirements)
 9. [ ] Build the deterministic comparison / gap engine
-10. [ ] Implement CVs: generation, editor, autosave, versioning
+10. [ ] Implement CVs: generation (curated from Experience/Project entries, ranked by skill-match against the job post), editor, autosave, versioning
 11. [ ] Set up Cloudflare R2 + CV PDF/DOC rendering (lazy per version)
 12. [ ] Integrate Stripe for subscriptions
 13. [ ] Add AI features (OpenAI Responses API, Pro only)
