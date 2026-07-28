@@ -1,1 +1,112 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent: #6366f1;
+  --color-accent-hover: #7c7ff2;
+  --color-accent-soft: #1e1f3a;
+  --color-bg-base: #0b0d10;
+  --color-bg-elevated: #212429;
+  --color-bg-surface: #141619;
+  --color-bg-surface-2: #1b1e23;
+  --color-border-strong: #33373e;
+  --color-border-subtle: #26292f;
+  --color-text-primary: #f2f3f5;
+  --color-text-secondary: #a5abb3;
+  --color-text-muted: #6b7280;
+  --color-sev-missing: #ef4444;
+  --color-sev-below: #f59e0b;
+  --color-sev-met: #10b981;
+  --color-sev-stale: #eab308;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+.light {
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-soft: #eef2ff;
+  --color-bg-base: #ffffff;
+  --color-bg-elevated: #e2e8f0;
+  --color-bg-surface: #f8fafc;
+  --color-bg-surface-2: #f1f5f9;
+  --color-border-strong: #cbd5e1;
+  --color-border-subtle: #e5e9ef;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-sev-missing: #dc2626;
+  --color-sev-below: #d97706;
+  --color-sev-met: #059669;
+  --color-sev-stale: #ca8a04;
+}
+
+/*
+ * shadcn/ui bridge: map its semantic tokens onto the DevPrep tokens above so
+ * generated primitives (Button, Input, Checkbox, ...) pick up the app theme.
+ * --accent/--accent-foreground are deliberately left as shadcn's own (unmapped)
+ * defaults — DevPrep's brand accent is exposed as --color-accent / bg-accent
+ * directly and must not be overwritten by shadcn's separate "accent" role.
+ */
+@theme inline {
+  --font-sans: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+}
+
+:root {
+  --background: var(--color-bg-base);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-bg-surface);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-bg-elevated);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-accent);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-bg-surface-2);
+  --secondary-foreground: var(--color-text-secondary);
+  --muted: var(--color-bg-surface-2);
+  --muted-foreground: var(--color-text-muted);
+  --destructive: var(--color-sev-missing);
+  --border: var(--color-border-subtle);
+  --input: var(--color-border-strong);
+  --ring: var(--color-accent);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

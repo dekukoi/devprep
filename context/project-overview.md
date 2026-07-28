@@ -58,13 +58,13 @@ The persistent, structured store of a user's skills, experience, certifications,
 
 Skills belong to a **fixed taxonomy** (closed list per category) to keep gap matching exact and reliable:
 
-| Category            | Icon            | Example Entries                       |
-| ------------------- | --------------- | ------------------------------------- |
-| 🔷 Languages        | `Code2`         | JavaScript, TypeScript, Python, Go    |
-| 🟣 Frameworks       | `Boxes`         | React, Next.js, Django, Express       |
-| 🟠 Tools            | `Wrench`        | Docker, Git, PostgreSQL, AWS          |
-| 🟡 Soft Skills      | `MessageSquare` | Communication, Leadership, Mentoring  |
-| 🟢 Domain Knowledge | `BookOpen`      | REST APIs, Auth, CI/CD, Testing       |
+| Category            | Icon            | Example Entries                              |
+| ------------------- | --------------- | --------------------------------------------- |
+| 🔷 Languages        | `Code2`         | JavaScript, TypeScript, Python, Go, SQL, Rust |
+| 🟣 Frameworks       | `Boxes`         | React, Next.js, Django, Express, GraphQL      |
+| 🟠 Tools            | `Wrench`        | Docker, Git, PostgreSQL, AWS, Kubernetes      |
+| 🟡 Soft Skills      | `MessageSquare` | Communication, Leadership, Mentoring          |
+| 🟢 Domain Knowledge | `BookOpen`      | REST API Design, Git & CI/CD, System Design   |
 
 > **Note:** Category set is fixed (5). Entries per category are a seeded closed list (see [Seed Data](#seed-data-for-fixed-taxonomy--templates)).
 
@@ -72,13 +72,13 @@ Skills belong to a **fixed taxonomy** (closed list per category) to keep gap mat
 
 Generated from a user's **Experience and Project** entries — not the Skill Bank's proficiency ratings directly — each tailored to a specific job post. When creating a CV, candidate Experience/Project entries are ranked by how well their linked skills match the job post's requirements; the user picks which ones populate the draft. The Skill Bank itself stays focused on tracking proficiency and feeding the deterministic gap-analysis engine (see Feature D). Editable and versioned over time.
 
-| Template     | Variants                         |
-| ------------ | -------------------------------- |
-| 🔷 Minimal   | No image · Image placeholder     |
-| 🟣 Classic   | No image · Image placeholder     |
-| 🟠 Modern    | No image · Image placeholder     |
+| Template   | Variants                          |
+| ---------- | ---------------------------------- |
+| 🔷 Aurora  | Single Column · Two Column         |
+| 🟣 Slate   | Single Column · Two Column         |
+| 🟠 Mono    | Single Column · Two Column         |
 
-> **Note:** 3 designs × 2 variants = **6 layouts**. On Free, only Minimal (no-image) is available. Templates are structured so the system can populate them from Skill Bank data and re-derive structured data back out.
+> **Note:** 3 designs × 2 variants = **6 layouts**. On Free, only Aurora (single-column) is available. Templates are structured so the system can populate them from Skill Bank data and re-derive structured data back out.
 
 ### C. Job Posts
 
@@ -288,8 +288,8 @@ enum ProficiencyLevel {
 }
 
 enum TemplateVariant {
-  NO_IMAGE
-  IMAGE_PLACEHOLDER
+  SINGLE_COLUMN
+  TWO_COLUMN
 }
 
 // ============================================
@@ -478,7 +478,7 @@ model Project {
 // ============================================
 model CVTemplate {
   id      String          @id @default(cuid())
-  name    String          // "Minimal" | "Classic" | "Modern"
+  name    String          // "Aurora" | "Slate" | "Mono"
   variant TemplateVariant
   cvs     CV[]
 
@@ -589,21 +589,21 @@ const prisma = new PrismaClient();
 
 // 5 fixed categories, each with a closed list of skills (sample shown — finalize before launch)
 const skillTaxonomy: Record<string, string[]> = {
-  'Languages': ['JavaScript', 'TypeScript', 'Python', 'Go', 'Java', 'SQL'],
-  'Frameworks': ['React', 'Next.js', 'Node.js', 'Django', 'Express'],
-  'Tools': ['Docker', 'Git', 'PostgreSQL', 'AWS', 'Kubernetes'],
+  'Languages': ['JavaScript', 'TypeScript', 'Python', 'SQL', 'Go', 'Rust'],
+  'Frameworks': ['React', 'Next.js', 'Node.js', 'Django', 'Express', 'GraphQL'],
+  'Tools': ['Docker', 'Git', 'PostgreSQL', 'AWS', 'Redis', 'Terraform', 'Celery', 'Linux', 'Kubernetes'],
   'Soft Skills': ['Communication', 'Leadership', 'Mentoring', 'Collaboration'],
-  'Domain Knowledge': ['REST APIs', 'Authentication', 'CI/CD', 'Testing', 'System Design'],
+  'Domain Knowledge': ['REST API Design', 'Git & CI/CD', 'System Design'],
 };
 
 // 3 templates × 2 variants = 6 rows
 const cvTemplates = [
-  { name: 'Minimal', variant: 'NO_IMAGE' },
-  { name: 'Minimal', variant: 'IMAGE_PLACEHOLDER' },
-  { name: 'Classic', variant: 'NO_IMAGE' },
-  { name: 'Classic', variant: 'IMAGE_PLACEHOLDER' },
-  { name: 'Modern', variant: 'NO_IMAGE' },
-  { name: 'Modern', variant: 'IMAGE_PLACEHOLDER' },
+  { name: 'Aurora', variant: 'SINGLE_COLUMN' },
+  { name: 'Aurora', variant: 'TWO_COLUMN' },
+  { name: 'Slate', variant: 'SINGLE_COLUMN' },
+  { name: 'Slate', variant: 'TWO_COLUMN' },
+  { name: 'Mono', variant: 'SINGLE_COLUMN' },
+  { name: 'Mono', variant: 'TWO_COLUMN' },
 ] as const;
 
 async function main() {
@@ -754,7 +754,7 @@ Reused directly from **DevStash** — same stack, same course tooling, no new in
 ```mermaid
 flowchart LR
     subgraph Free["Free Tier"]
-        F1["1 CV template (Minimal, no-image)"]
+        F1["1 CV template (Aurora, single-column)"]
         F2["30 Skill Bank entries"]
         F3["5 job posts / comparisons"]
         F4["Autosave every 5 min"]
@@ -775,7 +775,7 @@ flowchart LR
 
 | Feature                       |    Free     |     Pro     |
 | ----------------------------- | :---------: | :---------: |
-| CV templates                  | 1 (Minimal) |  All 6      |
+| CV templates                  | 1 (Aurora)  |  All 6      |
 | Skill Bank entries            |     30      | Unlimited   |
 | Job posts / comparisons       |      5      | Unlimited   |
 | Autosave cadence              |  Every 5 min | Continuous  |
