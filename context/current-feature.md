@@ -6,7 +6,7 @@ Mock Data, Theme Tokens & Component Library — turn the `context/designs/devpre
 ## Status
 <!-- Not Started | In Progress | Completed -->
 
-In Progress
+Completed
 
 ## Goals
 <!-- Goals and requirements -->
