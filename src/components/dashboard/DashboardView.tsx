@@ -14,6 +14,9 @@ import { OnboardingChecklist } from "./OnboardingChecklist";
 import { NewComparisonModal, type NewComparisonJobPost } from "./NewComparisonModal";
 import { RenameCvDialog } from "./RenameCvDialog";
 import { DeleteCvDialog } from "./DeleteCvDialog";
+import { DashboardSkeleton } from "./DashboardSkeleton";
+
+const INITIAL_LOAD_DELAY_MS = 800;
 
 export interface DashboardCvItem extends CvRowData {
   title: string;
@@ -43,6 +46,12 @@ export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardVi
   const [newComparisonOpen, setNewComparisonOpen] = React.useState(false);
   const [renameTarget, setRenameTarget] = React.useState<RenameTarget | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<DeleteTarget | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => setLoading(false), INITIAL_LOAD_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const isEmptyAccount = comparisons.length === 0 && cvList.length === 0;
 
@@ -121,18 +130,22 @@ export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardVi
         title="Dashboard"
         subtitle="Track your fit across postings and keep your CVs sharp."
         actions={
-          <button
-            type="button"
-            onClick={() => setNewComparisonOpen(true)}
-            className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] border-2 border-accent bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <Plus className="size-4" />
-            New comparison
-          </button>
+          loading ? undefined : (
+            <button
+              type="button"
+              onClick={() => setNewComparisonOpen(true)}
+              className="flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] border-2 border-accent bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <Plus className="size-4" />
+              New comparison
+            </button>
+          )
         }
       />
 
-      {isEmptyAccount ? (
+      {loading ? (
+        <DashboardSkeleton />
+      ) : isEmptyAccount ? (
         <OnboardingChecklist />
       ) : (
         <>
