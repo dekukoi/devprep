@@ -1,7 +1,7 @@
 # Current Feature
 <!-- Feature name and short description -->
 
-Prisma + Neon PostgreSQL Setup — wire up Prisma ORM against a Neon PostgreSQL database, with an initial schema based on the data models in `project-overview.md` (including the NextAuth models), created and applied only via migrations.
+App Shell — Sidebar + Topbar — finish the `Sidebar` and `Topbar` frames end-to-end per `context/designs/01-app-shell.md` (using `context/designs/devprep-design.pen` as the source of truth for visuals) and implement them as the persistent navigation shell every other screen will mount into.
 
 ## Status
 <!-- Not Started | In Progress | Completed -->
@@ -11,23 +11,25 @@ Completed
 ## Goals
 <!-- Goals and requirements -->
 
-- Use Neon PostgreSQL (serverless) as the database.
-- Create the initial schema based on the data models in `project-overview.md` (schema will evolve — this is a starting point, not final).
-- Include the NextAuth models (`Account`, `Session`, `VerificationToken`) alongside the app's own models.
-- Add appropriate indexes and cascade deletes.
-- Use Prisma 7 — read the full upgrade guide (breaking changes vs earlier Prisma versions) before writing schema/client code.
-- Always create and run migrations (`prisma migrate dev`, `prisma migrate deploy`) — never `prisma db push` or direct schema edits against the database.
+- Implement `Sidebar` (expanded + icon-only collapsed variants) and `Topbar` matching the finished Pencil frames exactly (colors, spacing, icon set, states).
+- Collapse/expand control persists preference across sessions; collapsed state shows hover tooltips.
+- Live count badges next to Skill Bank categories and Job Posts/CVs group headers, sourced from mock data for now.
+- Empty-state "+ Add" prompts for Job Posts/CVs groups when zero, plus a persistent "+" quick-add icon next to each group header.
+- Responsive: sidebar becomes a drawer below 1024px, opened via a Topbar hamburger icon (missing from the original mock, per the design doc); drawer closes on backdrop click, X, or Escape.
+- Functional-looking Topbar search with a grouped results dropdown (Job Posts / CVs / Skills) and a "No results" empty variant.
+- Notification bell dropdown (unread/read visual states, timestamps, per-type icons) with an empty "You're all caught up" variant.
+- Avatar dropdown menu (Profile, Settings, Upgrade to Pro, Sign out); gear icon navigates to a Settings screen (not yet designed — out of scope here, link can 404 or be a stub for now).
 
 ## Notes
 <!-- Any extra notes -->
 
-- Full requirements: `context/features/database-spec.md`.
-- We will have a development branch (used via `DATABASE_URL` locally) and a separate production branch in Neon — always create migrations and never push directly unless explicitly told otherwise.
-- Prisma 7 upgrade guide: https://www.prisma.io/docs/orm/more/upgrade-guides/upgrading-versions/upgrading-to-prisma-7
-- Prisma Postgres quickstart: https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres
+- Full per-screen spec: `context/designs/01-app-shell.md`; cross-cutting rules (states, Pro gating, a11y, responsive, tokens): `context/designs/00-general.md`.
+- Pencil design source: `context/designs/devprep-design.pen` — reusable `Sidebar` (`o8x4vF`) and `Topbar` (`OZLrf`) components, plus finished state frames: `Sidebar — Collapsed`, `Sidebar — Empty Groups`, `Topbar — Mobile Drawer Open`, `Topbar — Search Results`, `Topbar — Search No Results`, `Topbar — Notifications`, `Topbar — Notifications Empty`, `Topbar — Avatar Menu`. All 8 already finished in Pencil — this feature is the React/Tailwind implementation of that finished design, not new design work.
+- Design tokens already wired in `src/app/globals.css` (`--color-*`, `--radius-*`) match the .pen file's variables 1:1 — reuse them directly, don't reinterpret.
+- No `dropdown-menu`/`popover` shadcn primitives exist yet in `src/components/ui/` — hand-write them from `radix-ui` following the existing `tooltip.tsx` pattern.
+- This is shell/navigation UI only — full screens behind these nav items (Dashboard, Skill Bank, Job Posts, CVs, Settings) are separate, later features. Mount the shell in `src/app/page.tsx` with placeholder main content just enough to verify it in the browser.
 - Next.js 16 / React 19, Turbopack is the default for `dev` and `build`.
 - Per `AGENTS.md`: this is a modified Next.js — consult `node_modules/next/dist/docs/` before writing framework code.
-- This feature is DB/ORM setup only — no UI work. Builds on the mock-data types/fixtures and component library from the prior feature, which stay in place.
 
 ## History
 
@@ -46,3 +48,4 @@ Completed
 - **2026-07-29** — Marked Mock Data, Theme Tokens & Component Library complete. Started this feature (Prisma + Neon PostgreSQL Setup) per `context/features/database-spec.md`: initial schema from `project-overview.md`'s data models, NextAuth models included, migrations-only workflow, Prisma 7.
 - **2026-07-29** — Implemented and verified: linked the repo to the existing Neon "Devprep" project's `development` branch (`neon link`, pulling pooled `DATABASE_URL` + direct `DATABASE_URL_UNPOOLED` into git-ignored `.env.local`); installed Prisma 7.9.1 with the `prisma-client` generator (output `src/generated/prisma`), `@prisma/adapter-pg` driver adapter, `pg`, and `dotenv`; wrote the full schema from `project-overview.md` (all app models + NextAuth's `Account`/`Session`/`VerificationToken`, indexes, cascade deletes); created `prisma.config.ts` and ran `prisma migrate dev --name init` + `prisma generate`; added the runtime client singleton at `src/lib/prisma.ts` using the pooled connection. `npm run build` and `npm run lint` both pass. Confirmed by deliberately breaking each URL in turn that the CLI uses the **direct** connection for migrations while the app singleton uses the **pooled** one. Note: Prisma 7.9.1's actual `prisma.config.ts` `Datasource` type only has `url`/`shadowDatabaseUrl` — no `directUrl` (unlike some docs/skill references) — so `url` is set to the direct URL there, since with driver adapters that config value is CLI-only and the app's runtime client supplies its own pooled connection string independently. Did not touch the Neon `production` branch or seed the taxonomy/CV templates — seeding is `project-overview.md`'s separate Next Steps item 5, out of scope here.
 - **2026-07-29** — Added `scripts/test-db.ts` (connects via the `@prisma/adapter-pg` driver adapter, runs `SELECT 1`, prints row counts) and a `db:test` npm script, to sanity-check the Neon connection now that setup is done; installed `tsx` as a dev dependency to run standalone TS scripts (no `ts-node`/native TS execution was in place). Then closed out Next Steps item 5: wrote `prisma/seed.ts` seeding the 5 fixed `SkillCategory` rows and 28 `Skill` rows (matching `src/lib/mock-data/skills.ts` exactly, not the smaller sample list in `project-overview.md` — left a comment to keep the two in sync) plus the 6 `CVTemplate` rows, all via `upsert` so it's safe to re-run; wired `migrations.seed: "tsx prisma/seed.ts"` into `prisma.config.ts` so `prisma migrate dev`/`prisma db seed` picks it up automatically, and added a `db:seed` npm script. Ran it against the Neon `development` branch and verified via `db:test`: 5 categories / 28 skills / 6 templates.
+- **2026-07-29** — Marked Prisma + Neon PostgreSQL Setup complete. Started and finished this feature (App Shell — Sidebar + Topbar) on branch `feature/app-shell-sidebar-topbar`, implementing the 8 finished Pencil frames from `context/designs/devprep-design.pen`. Added `src/components/ui/popover.tsx` and `dropdown-menu.tsx` (hand-written `radix-ui` wrappers, no shadcn CLI available offline); `src/lib/constants/icons.ts` (a string-keyed `ICON_REGISTRY`/`IconName`, needed because passing Lucide component references as props from the server-component `page.tsx` into the client `Topbar` fails RSC serialization — Next.js build caught this); rewrote `Sidebar.tsx` (expanded + icon-only collapsed variants, Radix `Tooltip` on collapsed icons, empty-group "+ Add" prompts, active-route highlighting via `usePathname`) and `Topbar.tsx` (Radix `Popover`-based search with grouped/no-results states, notifications `Popover` with read/unread styling and mark-all-read, avatar `DropdownMenu`); added `src/components/layout/AppShell.tsx` composing both with a responsive mobile drawer (`<1024px`, Escape/backdrop/X to close) and a desktop collapse toggle persisted to `localStorage` via `useSyncExternalStore` (required instead of the more obvious `useEffect`+`setState` pattern — the project's `react-hooks/set-state-in-effect` ESLint rule treats that as an error; `useSyncExternalStore` is also the more correct fit for external state like `matchMedia`/`localStorage`). Wired real mock data into `src/app/page.tsx` (skill counts, job posts, CVs, search index, notifications) behind a placeholder "Dashboard" main content area. Verified end-to-end in the browser: search filter/grouping/no-results, notifications open + mark-all-read + unread-dot clears, avatar menu, sidebar collapse + persistence across reload (no hydration errors), mobile drawer open/close/nav-closes-it, desktop sidebar correctly hidden at mobile width. `npm run lint` and `npm run build` both pass.
