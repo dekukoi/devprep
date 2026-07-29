@@ -28,6 +28,7 @@ interface DashboardViewProps {
   comparisons: RecentComparisonCardData[];
   cvs: DashboardCvItem[];
   jobPosts: NewComparisonJobPost[];
+  comparisonIdByJobId: Record<string, string>;
 }
 
 interface RenameTarget {
@@ -42,7 +43,7 @@ interface DeleteTarget {
   version: number;
 }
 
-export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardViewProps) {
+export function DashboardView({ stats, comparisons, cvs, jobPosts, comparisonIdByJobId }: DashboardViewProps) {
   const router = useRouter();
   const [cvList, setCvList] = React.useState(cvs);
   const [newComparisonOpen, setNewComparisonOpen] = React.useState(false);
@@ -122,7 +123,13 @@ export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardVi
   };
 
   const handleRunComparison = (job: NewComparisonJobPost) => {
-    toast.success(`Comparison run for ${job.company} — ${job.role}`);
+    const comparisonId = comparisonIdByJobId[job.id];
+    if (comparisonId) {
+      toast.success("Comparison run completed");
+      router.push(`/comparisons/${comparisonId}`);
+    } else {
+      toast.success(`Comparison run for ${job.company} — ${job.role}`);
+    }
   };
 
   return (

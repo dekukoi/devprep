@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/shared";
@@ -23,6 +24,7 @@ function makeLocalId(prefix: string) {
 }
 
 export function JobPostsView({ data, initialSelectedId }: JobPostsViewProps) {
+  const router = useRouter();
   const [jobsById, setJobsById] = React.useState<Record<string, JobPostFull>>(data.detailsById);
   const [order, setOrder] = React.useState<string[]>(data.items.map((i) => i.id));
   const [selectedId, setSelectedId] = React.useState<string | null>(initialSelectedId);
@@ -57,6 +59,7 @@ export function JobPostsView({ data, initialSelectedId }: JobPostsViewProps) {
       salaryRange: null,
       createdAt: new Date().toISOString(),
       fitScore: null,
+      comparisonId: null,
       requirements: [],
       unresolved: [],
     };
@@ -90,7 +93,12 @@ export function JobPostsView({ data, initialSelectedId }: JobPostsViewProps) {
 
   const handleRunComparison = () => {
     if (!selectedJob) return;
-    toast.success(`Comparison run for ${selectedJob.company ?? selectedJob.title}`);
+    if (selectedJob.comparisonId) {
+      toast.success("Comparison run completed");
+      router.push(`/comparisons/${selectedJob.comparisonId}`);
+    } else {
+      toast.success(`Comparison run for ${selectedJob.company ?? selectedJob.title}`);
+    }
   };
 
   const handleChangeLevel = (requirementId: string, level: ProficiencyLevel) => {

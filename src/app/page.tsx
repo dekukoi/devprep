@@ -44,6 +44,10 @@ export default function Home() {
     role: job.title,
   }));
 
+  const comparisonIdByJobId: Record<string, string> = Object.fromEntries(
+    comparisons.map((c) => [c.jobPostId, c.id]),
+  );
+
   return (
     <AppShell {...shellData}>
       <DashboardView
@@ -51,6 +55,7 @@ export default function Home() {
         comparisons={dashboardComparisons}
         cvs={dashboardCvs}
         jobPosts={dashboardJobPosts}
+        comparisonIdByJobId={comparisonIdByJobId}
       />
     </AppShell>
   );
