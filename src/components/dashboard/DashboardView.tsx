@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Briefcase, FileText, Layers, Plus, Target } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared";
@@ -42,6 +43,7 @@ interface DeleteTarget {
 }
 
 export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardViewProps) {
+  const router = useRouter();
   const [cvList, setCvList] = React.useState(cvs);
   const [newComparisonOpen, setNewComparisonOpen] = React.useState(false);
   const [renameTarget, setRenameTarget] = React.useState<RenameTarget | null>(null);
@@ -94,8 +96,7 @@ export function DashboardView({ stats, comparisons, cvs, jobPosts }: DashboardVi
   };
 
   const handleChangeTemplate = (id: string) => {
-    void id;
-    toast.info("Change template — coming soon");
+    router.push(`/cvs/templates?cvId=${id}`);
   };
 
   const handleExportPdf = (id: string) => {
