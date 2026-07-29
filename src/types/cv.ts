@@ -1,5 +1,6 @@
 export type CVTemplateName = "Aurora" | "Slate" | "Mono";
 export type TemplateVariant = "SINGLE_COLUMN" | "TWO_COLUMN";
+export type TemplateFamily = "Modern" | "Classic" | "Minimal";
 
 export interface CVTemplate {
   id: string;
