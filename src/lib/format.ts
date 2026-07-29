@@ -2,6 +2,14 @@ export function formatShortDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+export function formatMonthYear(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+export function formatDateRange(startIso: string, endIso: string | null) {
+  return `${formatMonthYear(startIso)} – ${endIso ? formatMonthYear(endIso) : "Present"}`;
+}
+
 export function formatCompactRelativeDate(iso: string) {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days <= 0) return "today";
