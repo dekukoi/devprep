@@ -17,6 +17,8 @@ export interface SkillBankEntry {
   skillId: string;
   proficiencyLevel: ProficiencyLevel;
   yearsOfExperience: number | null;
+  lastUsedAt: string;
+  tags?: string[];
   createdAt: string;
   updatedAt: string;
 }
