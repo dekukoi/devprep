@@ -1,7 +1,5 @@
 {
-  "_init": {
-    "features": [
-      "database"
-    ]
-  }
+  "orgId": "org-calm-sea-33696733",
+  "projectId": "raspy-hat-59967751",
+  "branch": "development"
 }

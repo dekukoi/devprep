@@ -1,7 +1,7 @@
 # Current Feature
 <!-- Feature name and short description -->
 
-Mock Data, Theme Tokens & Component Library — turn the `context/designs/devprep-design.pen` UI design into a working frontend foundation: typed mock data, the dark/light theme token system, and the 18 reusable atom/molecule components, in that order. Full page assembly and Prisma/DB wiring are out of scope for this feature.
+Prisma + Neon PostgreSQL Setup — wire up Prisma ORM against a Neon PostgreSQL database, with an initial schema based on the data models in `project-overview.md` (including the NextAuth models), created and applied only via migrations.
 
 ## Status
 <!-- Not Started | In Progress | Completed -->
@@ -11,19 +11,23 @@ Completed
 ## Goals
 <!-- Goals and requirements -->
 
-- Mock data: `src/types/*.ts` shapes mirroring the Prisma models in `project-overview.md`, plus `src/lib/mock-data/*.ts` fixtures matching the content already visible in the design (user, skill taxonomy, experience, CVs, job posts, a comparison).
-- Theme tokens: install `next-themes`, wire a `ThemeProvider` (dark default), load Inter, and define the 16 color tokens + radii from the `.pen` file's variables in `globals.css` via Tailwind v4's `@theme`.
-- Component library: init shadcn/ui, add `lucide-react`, and build the 18 reusable components (buttons, badges, chips, inputs, card, stat tile, list row, empty state, panel shell, segmented control, page header, sidebar, topbar, toast, pro-lock badge) styled from the new tokens.
-- Reconcile `project-overview.md`'s stale CV template naming (`Minimal/Classic/Modern`, `NO_IMAGE/IMAGE_PLACEHOLDER`) and skill-taxonomy counts with what the design actually shows (`Aurora/Slate/Mono` × `Single/Two Column`; 6/5/8/4/3 skills per category).
+- Use Neon PostgreSQL (serverless) as the database.
+- Create the initial schema based on the data models in `project-overview.md` (schema will evolve — this is a starting point, not final).
+- Include the NextAuth models (`Account`, `Session`, `VerificationToken`) alongside the app's own models.
+- Add appropriate indexes and cascade deletes.
+- Use Prisma 7 — read the full upgrade guide (breaking changes vs earlier Prisma versions) before writing schema/client code.
+- Always create and run migrations (`prisma migrate dev`, `prisma migrate deploy`) — never `prisma db push` or direct schema edits against the database.
 
 ## Notes
 <!-- Any extra notes -->
 
+- Full requirements: `context/features/database-spec.md`.
+- We will have a development branch (used via `DATABASE_URL` locally) and a separate production branch in Neon — always create migrations and never push directly unless explicitly told otherwise.
+- Prisma 7 upgrade guide: https://www.prisma.io/docs/orm/more/upgrade-guides/upgrading-versions/upgrading-to-prisma-7
+- Prisma Postgres quickstart: https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres
 - Next.js 16 / React 19, Turbopack is the default for `dev` and `build`.
 - Per `AGENTS.md`: this is a modified Next.js — consult `node_modules/next/dist/docs/` before writing framework code.
-- Design source of truth: `context/designs/devprep-design.pen` (read only via the Pencil MCP tools — never Read/Grep directly, it's encrypted). The `context/designs/*.md` prompt docs (added in commit `fc8c37e`) are what generated it.
-- The exported CV document itself (`CV Paper` in the CV Editor design) stays hardcoded light/print-styled regardless of app theme — do not theme it with the new tokens.
-- No Prisma/database work in this feature — mock data is plain TypeScript fixtures, not a seed script.
+- This feature is DB/ORM setup only — no UI work. Builds on the mock-data types/fixtures and component library from the prior feature, which stay in place.
 
 ## History
 
@@ -39,3 +43,5 @@ Completed
 - **2026-07-28** — Added `context/designs/*.md` design prompt docs (per-screen UI/UX specs used to generate the `.pen` file) and updated `project-overview.md` to add Projects as a primary content source alongside Experience. _(commit `fc8c37e`)_
 - **2026-07-28** — Marked Project Initialization & Setup complete; the Next.js foundation and context docs are in place. Started this feature (mock data → theme tokens → component library) based on the newly-added `context/designs/devprep-design.pen` UI design.
 - **2026-07-28** — Implemented all three phases: (1) `src/types/*.ts` + `src/lib/mock-data/*.ts` fixtures matching the design 1:1 (verified Skill Bank category counts 6/5/8/4/3 against the design's tab badges); (2) `next-themes` + Tailwind v4 `@theme` tokens in `globals.css`, Inter via `next/font`; (3) shadcn/ui initialized (Nova/Radix/Lucide preset) and bridged onto the DevPrep tokens, plus the 18 reusable atoms/molecules from the design (`src/components/shared/`, `src/components/layout/`). Also reconciled `project-overview.md`'s stale CV template naming and skill-taxonomy counts to match the design. Verified via a scratch preview page in the browser (computed-style checks confirmed exact token matches in both dark and light themes, then removed); `lint` and `build` both pass. Noted rough edge: `next-themes`' hydration-guard `<script>` tag triggers a harmless React 19 dev console warning ("Encountered a script tag...") on every page — functionality is unaffected (verified theme toggling works correctly); revisit if `next-themes` ships a fix.
+- **2026-07-29** — Marked Mock Data, Theme Tokens & Component Library complete. Started this feature (Prisma + Neon PostgreSQL Setup) per `context/features/database-spec.md`: initial schema from `project-overview.md`'s data models, NextAuth models included, migrations-only workflow, Prisma 7.
+- **2026-07-29** — Implemented and verified: linked the repo to the existing Neon "Devprep" project's `development` branch (`neon link`, pulling pooled `DATABASE_URL` + direct `DATABASE_URL_UNPOOLED` into git-ignored `.env.local`); installed Prisma 7.9.1 with the `prisma-client` generator (output `src/generated/prisma`), `@prisma/adapter-pg` driver adapter, `pg`, and `dotenv`; wrote the full schema from `project-overview.md` (all app models + NextAuth's `Account`/`Session`/`VerificationToken`, indexes, cascade deletes); created `prisma.config.ts` and ran `prisma migrate dev --name init` + `prisma generate`; added the runtime client singleton at `src/lib/prisma.ts` using the pooled connection. `npm run build` and `npm run lint` both pass. Confirmed by deliberately breaking each URL in turn that the CLI uses the **direct** connection for migrations while the app singleton uses the **pooled** one. Note: Prisma 7.9.1's actual `prisma.config.ts` `Datasource` type only has `url`/`shadowDatabaseUrl` — no `directUrl` (unlike some docs/skill references) — so `url` is set to the direct URL there, since with driver adapters that config value is CLI-only and the app's runtime client supplies its own pooled connection string independently. Did not touch the Neon `production` branch or seed the taxonomy/CV templates — seeding is `project-overview.md`'s separate Next Steps item 5, out of scope here.

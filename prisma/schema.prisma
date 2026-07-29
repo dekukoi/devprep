@@ -1,0 +1,311 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+enum ProficiencyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum TemplateVariant {
+  SINGLE_COLUMN
+  TWO_COLUMN
+}
+
+// ============================================
+// USER
+// ============================================
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  emailVerified        DateTime?
+  name                 String?
+  image                String?
+  password             String?
+  isPro                Boolean   @default(false)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  skillBankEntries SkillBankEntry[]
+  experiences      Experience[]
+  certifications   Certification[]
+  projects         Project[]
+  cvs              CV[]
+  jobPosts         JobPost[]
+  comparisons      Comparison[]
+  accounts         Account[]
+  sessions         Session[]
+
+  @@map("users")
+}
+
+// ============================================
+// NEXTAUTH MODELS
+// ============================================
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// FIXED TAXONOMY (system-seeded)
+// ============================================
+model SkillCategory {
+  id     String  @id @default(cuid())
+  name   String  @unique // Languages | Frameworks | Tools | Soft Skills | Domain Knowledge
+  skills Skill[]
+
+  @@map("skill_categories")
+}
+
+model Skill {
+  id         String        @id @default(cuid())
+  name       String
+  categoryId String
+  category   SkillCategory @relation(fields: [categoryId], references: [id])
+
+  bankEntries     SkillBankEntry[]
+  jobRequirements JobPostRequirement[]
+  experiences     Experience[]         @relation("ExperienceSkills")
+  certifications  Certification[]      @relation("CertificationSkills")
+  projects        Project[]            @relation("ProjectSkills")
+
+  @@unique([categoryId, name])
+  @@index([categoryId])
+  @@map("skills")
+}
+
+// ============================================
+// SKILL BANK
+// ============================================
+model SkillBankEntry {
+  id                String           @id @default(cuid())
+  proficiencyLevel  ProficiencyLevel
+  yearsOfExperience Int?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId]) // one claim per skill per user
+  @@index([userId])
+  @@map("skill_bank_entries")
+}
+
+model Experience {
+  id        String    @id @default(cuid())
+  company   String
+  title     String
+  startDate DateTime
+  endDate   DateTime? // null = current role
+  bullets   String[]  // one or many accomplishment lines
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkedSkills Skill[]   @relation("ExperienceSkills")
+  projects     Project[] // projects that happened during this role (optional link)
+
+  @@index([userId])
+  @@map("experiences")
+}
+
+model Certification {
+  id            String    @id @default(cuid())
+  name          String
+  issuer        String
+  issueDate     DateTime
+  expiryDate    DateTime?
+  credentialUrl String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkedSkills Skill[] @relation("CertificationSkills")
+
+  @@index([userId])
+  @@map("certifications")
+}
+
+// Peer to Experience, not a sub-item of it — covers personal/open-source/freelance/
+// hackathon/multi-role work as well as finer-grained curation within a single job.
+model Project {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  bullets     String[]  // accomplishment lines, same shape as Experience.bullets
+  startDate   DateTime?
+  endDate     DateTime? // null = ongoing / no end date
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experienceId String?     // optional — set when this project happened during a specific role
+  experience   Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  linkedSkills Skill[]     @relation("ProjectSkills")
+
+  @@index([userId])
+  @@index([experienceId])
+  @@map("projects")
+}
+
+// ============================================
+// CVs
+// ============================================
+model CVTemplate {
+  id      String          @id @default(cuid())
+  name    String          // "Aurora" | "Slate" | "Mono"
+  variant TemplateVariant
+  cvs     CV[]
+
+  @@unique([name, variant]) // 3 names × 2 variants = 6 rows
+  @@map("cv_templates")
+}
+
+model CV {
+  id              String   @id @default(cuid())
+  title           String   // user label, e.g. "Backend Dev - Acme App"
+  draftContent    Json     // live, mutable autosave working copy (not versioned itself)
+  latestVersionId String?  // denormalized pointer to newest CVVersion, for fast lookups
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  templateId String
+  template   CVTemplate @relation(fields: [templateId], references: [id])
+  jobPostId  String?    // which post it was tailored for (optional)
+  jobPost    JobPost?   @relation(fields: [jobPostId], references: [id])
+
+  versions CVVersion[]
+
+  @@index([userId])
+  @@map("cvs")
+}
+
+// Immutable checkpoints — created only on manual Save.
+model CVVersion {
+  id              String   @id @default(cuid())
+  versionNumber   Int
+  content         Json     // snapshot at this version
+  contentHash     String   // cheap diff-check before creating a new version
+  renderedFileUrl String?  // R2 URL — populated lazily on first export/download
+  createdAt       DateTime @default(now())
+
+  cvId String
+  cv   CV     @relation(fields: [cvId], references: [id], onDelete: Cascade)
+
+  @@unique([cvId, versionNumber])
+  @@index([cvId])
+  @@map("cv_versions")
+}
+
+// ============================================
+// JOB POSTS & COMPARISON
+// ============================================
+model JobPost {
+  id        String   @id @default(cuid())
+  title     String
+  company   String?
+  content   String   @db.Text // raw pasted job description text
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  requirements JobPostRequirement[]
+  comparisons  Comparison[]
+  cvs          CV[]
+
+  @@index([userId])
+  @@map("job_posts")
+}
+
+model JobPostRequirement {
+  id            String           @id @default(cuid())
+  requiredLevel ProficiencyLevel
+  weight        Int? // importance, for weighted scoring (optional)
+
+  jobPostId String
+  jobPost   JobPost @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  skillId   String
+  skill     Skill   @relation(fields: [skillId], references: [id])
+
+  @@unique([jobPostId, skillId])
+  @@index([jobPostId])
+  @@map("job_post_requirements")
+}
+
+model Comparison {
+  id        String   @id @default(cuid())
+  fitScore  Int      // 0–100
+  gaps      Json     // [{ skill, requiredLevel, currentLevel, severity }]
+  advice    String   @db.Text // rule-based text generated from gaps
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPostId String
+  jobPost   JobPost @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([jobPostId])
+  @@map("comparisons")
+}
