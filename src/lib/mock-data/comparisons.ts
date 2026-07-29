@@ -207,4 +207,54 @@ export const comparisons: Comparison[] = [
       "3. Strengthen System Design — one level below the required Advanced bar.",
     createdAt: "2026-07-18T11:15:00.000Z",
   },
+  {
+    id: "cmp-stark",
+    userId: mockUser.id,
+    jobPostId: "job-stark",
+    fitScore: 73,
+    gaps: [
+      {
+        skillId: "skill-kubernetes",
+        skillName: "Kubernetes",
+        requiredLevel: "ADVANCED",
+        currentLevel: null,
+        severity: "missing",
+      },
+      {
+        skillId: "skill-terraform",
+        skillName: "Terraform",
+        requiredLevel: "ADVANCED",
+        currentLevel: "BEGINNER",
+        severity: "below",
+      },
+    ],
+    advice:
+      "1. Add Kubernetes — this platform role requires it and it's currently unclaimed in your Skill Bank.\n" +
+      "2. Deepen Terraform — you're claiming Beginner against an Advanced requirement.",
+    createdAt: "2026-06-21T09:00:00.000Z",
+  },
+  {
+    id: "cmp-wayne",
+    userId: mockUser.id,
+    jobPostId: "job-wayne",
+    fitScore: 88,
+    gaps: [
+      {
+        skillId: "skill-go",
+        skillName: "Go",
+        requiredLevel: "ADVANCED",
+        currentLevel: "INTERMEDIATE",
+        severity: "below",
+      },
+      {
+        skillId: "skill-react",
+        skillName: "React",
+        requiredLevel: "ADVANCED",
+        currentLevel: "ADVANCED",
+        severity: "met",
+      },
+    ],
+    advice: "1. Deepen Go — you're one level below the Advanced bar; React already clears it.",
+    createdAt: "2026-06-13T10:30:00.000Z",
+  },
 ];
