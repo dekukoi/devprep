@@ -1,4 +1,4 @@
-import type { CV, CVContent, CVTemplate, CVVersion } from "@/types/cv";
+import type { CV, CVContent, CVSuggestion, CVTemplate, CVVersion } from "@/types/cv";
 import { mockUser } from "./user";
 
 export const cvTemplates: CVTemplate[] = [
@@ -110,6 +110,7 @@ export const cvVersions: CVVersion[] = [
       content: acmeContent,
       contentHash: `hash-acme-v${i + 1}`,
       renderedFileUrl: null,
+      note,
       createdAt: new Date(Date.UTC(2026, 5, 1 + i * 12, 10)).toISOString(),
     }),
   ),
@@ -120,6 +121,7 @@ export const cvVersions: CVVersion[] = [
     content: globexContent,
     contentHash: "hash-globex-v1",
     renderedFileUrl: null,
+    note: "Initial draft from Skill Bank import",
     createdAt: "2026-06-15T10:00:00.000Z",
   },
   {
@@ -129,6 +131,41 @@ export const cvVersions: CVVersion[] = [
     content: initechContent,
     contentHash: "hash-initech-v1",
     renderedFileUrl: null,
+    note: "Initial draft from Skill Bank import",
     createdAt: "2026-06-20T10:00:00.000Z",
   },
 ];
+
+/** Pending suggestions for cv-acme, matching the `Screen — CV Editor` Pencil frame's 3 Suggestions-panel cards. */
+export const cvSuggestions: CVSuggestion[] = [
+  {
+    id: "sug-acme-summary",
+    cvId: "cv-acme",
+    target: "summary",
+    targetLabel: "SUMMARY",
+    icon: "sparkles",
+    description: "Rewrite to lead with distributed systems impact",
+  },
+  {
+    id: "sug-acme-experience-lumen",
+    cvId: "cv-acme",
+    target: "experience",
+    targetLabel: "EXPERIENCE · LUMEN",
+    icon: "plus",
+    description: "Add Kubernetes + Terraform bullet (infra match)",
+    experienceIndex: 0,
+    bulletText: "Built CI/CD pipelines with Kubernetes and Terraform — matches Acme's infra stack.",
+  },
+  {
+    id: "sug-acme-skills",
+    cvId: "cv-acme",
+    target: "skills",
+    targetLabel: "SKILLS",
+    icon: "arrow-up-down",
+    description: "Reorder to surface PostgreSQL and AWS first",
+    reorderSkillsFirst: ["PostgreSQL", "AWS"],
+  },
+];
+
+/** Which claimed skill (per CV) has a Skill Bank entry the CV's Skills chip row hasn't synced since — drives the stale-field marker/tooltip on that chip. */
+export const cvStaleSkillDetails: { cvId: string; skillName: string }[] = [{ cvId: "cv-acme", skillName: "Docker" }];

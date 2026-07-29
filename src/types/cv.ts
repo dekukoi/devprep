@@ -48,5 +48,26 @@ export interface CVVersion {
   content: CVContent;
   contentHash: string;
   renderedFileUrl: string | null;
+  /** Short human-authored description of what changed in this version, shown in Version History. */
+  note: string;
   createdAt: string;
+}
+
+export type CVSuggestionTarget = "summary" | "experience" | "skills";
+
+/** A pending AI/gap-based suggestion shown in the CV Editor's Suggestions panel. */
+export interface CVSuggestion {
+  id: string;
+  cvId: string;
+  target: CVSuggestionTarget;
+  /** Right-rail card label, e.g. "SUMMARY" or "EXPERIENCE · LUMEN". */
+  targetLabel: string;
+  icon: "sparkles" | "plus" | "arrow-up-down";
+  description: string;
+  /** For target === "experience": which entry (by index into CVContent.experience) the suggested bullet is shown inline under. */
+  experienceIndex?: number;
+  /** For target === "experience": the suggested bullet text, appended to that entry's bullets on accept. */
+  bulletText?: string;
+  /** For target === "skills": skill names to move to the front of CVContent.skills on accept. */
+  reorderSkillsFirst?: string[];
 }
