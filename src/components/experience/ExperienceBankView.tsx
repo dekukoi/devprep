@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Briefcase, CircleAlert, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/shared";
@@ -26,6 +27,7 @@ interface ExperienceBankViewProps {
 type PanelState = { mode: "add" | "edit"; entry?: ExperienceView } | null;
 
 export function ExperienceBankView({ data }: ExperienceBankViewProps) {
+  const router = useRouter();
   const [status, setStatus] = React.useState<"loading" | "error" | "ready">("loading");
   const [experiences, setExperiences] = React.useState<ExperienceView[]>(data.experiences);
   const [panel, setPanel] = React.useState<PanelState>(null);
@@ -45,7 +47,7 @@ export function ExperienceBankView({ data }: ExperienceBankViewProps) {
 
   const handleAddClick = () => setPanel({ mode: "add" });
   const handleEditClick = (entry: ExperienceView) => setPanel({ mode: "edit", entry });
-  const handleAddProject = () => toast.info("Projects Bank — coming soon");
+  const handleAddProject = (experienceId: string) => router.push(`/projects?experienceId=${experienceId}`);
 
   const handleSave = (values: ExperienceFormValues) => {
     const linkedSkillNames = values.linkedSkillIds
@@ -153,7 +155,7 @@ export function ExperienceBankView({ data }: ExperienceBankViewProps) {
                   experience={exp}
                   onEdit={() => handleEditClick(exp)}
                   onDelete={() => setDeleteTarget(exp)}
-                  onAddProject={handleAddProject}
+                  onAddProject={() => handleAddProject(exp.id)}
                 />
               ))}
               {experiences.length === 0 && (
