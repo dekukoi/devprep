@@ -34,6 +34,8 @@ export interface CV {
   title: string;
   draftContent: CVContent;
   latestVersionId: string | null;
+  /** Field names in `draftContent` that have diverged from the Skill Bank since the CV was last synced. */
+  staleFields?: string[];
   createdAt: string;
   updatedAt: string;
 }

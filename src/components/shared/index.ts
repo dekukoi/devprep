@@ -8,3 +8,4 @@ export { PanelShell } from "./PanelShell";
 export { SegmentedControl } from "./SegmentedControl";
 export { PageHeader } from "./PageHeader";
 export { ProLockBadge } from "./ProLockBadge";
+export { ScoreRing } from "./ScoreRing";

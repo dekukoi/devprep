@@ -65,6 +65,7 @@ export const cvs: CV[] = [
     title: "Backend Developer - Acme App",
     draftContent: acmeContent,
     latestVersionId: "cvv-acme-5",
+    staleFields: ["skills"],
     createdAt: "2026-06-01T10:00:00.000Z",
     updatedAt: "2026-07-26T09:00:00.000Z",
   },
