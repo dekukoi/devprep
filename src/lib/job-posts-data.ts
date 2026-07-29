@@ -33,6 +33,7 @@ export interface JobPostFull {
   salaryRange: string | null;
   createdAt: string;
   fitScore: number | null;
+  comparisonId: string | null;
   requirements: JobPostRequirementItem[];
   unresolved: JobPostUnresolvedItem[];
 }
@@ -94,6 +95,7 @@ export function getJobPostsData(): JobPostsData {
       salaryRange: job.salaryRange ?? null,
       createdAt: job.createdAt,
       fitScore: comparisons.find((c) => c.jobPostId === job.id)?.fitScore ?? null,
+      comparisonId: comparisons.find((c) => c.jobPostId === job.id)?.id ?? null,
       requirements,
       unresolved,
     };
