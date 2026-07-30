@@ -967,6 +967,7 @@ devprep/
 14. [ ] Implement usage limits for the free tier
 15. [ ] Testing & polish
 16. [ ] Deploy to production
+17. [ ] Add a deterministic "bullet impact quality" signal (quantified / action-only / vague, derived from `Experience.bullets` / `Project.bullets` text) surfaced as: a badge on Experience/Project cards, a tiebreaker in CV Curate Content ranking, and a new advice category in the Comparison Report's rule-based advice (alongside skill-gap advice) — backlogged behind items 7–9; AI bullet rewriter (item 13) should target this same gap once built, not just job-post tone-matching
 
 ---
 
