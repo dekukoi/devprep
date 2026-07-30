@@ -63,7 +63,7 @@ export function ComparisonReportView({ job, history: initialHistory }: Compariso
   };
 
   const handleGenerateCv = () => {
-    router.push("/cvs/templates");
+    router.push(`/cvs/templates?jobPostId=${job.id}`);
   };
 
   const handleSkillBankJump = React.useCallback(() => {

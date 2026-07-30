@@ -4,11 +4,11 @@ import { getAppShellData } from "@/lib/app-shell-data";
 import { cvs, cvTemplates } from "@/lib/mock-data";
 
 interface CvTemplatesPageProps {
-  searchParams: Promise<{ cvId?: string }>;
+  searchParams: Promise<{ cvId?: string; jobPostId?: string }>;
 }
 
 export default async function CvTemplatesPage({ searchParams }: CvTemplatesPageProps) {
-  const { cvId } = await searchParams;
+  const { cvId, jobPostId } = await searchParams;
   const shellData = getAppShellData();
   const cv = cvId ? cvs.find((c) => c.id === cvId) : undefined;
 
@@ -17,6 +17,7 @@ export default async function CvTemplatesPage({ searchParams }: CvTemplatesPageP
       <CvTemplatePickerView
         templates={cvTemplates}
         cv={cv ? { id: cv.id, title: cv.title, templateId: cv.templateId } : null}
+        jobPostId={cv ? undefined : jobPostId}
       />
     </AppShell>
   );
