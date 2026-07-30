@@ -957,8 +957,8 @@ devprep/
 4. [X] Build core UI components with shadcn/ui
 5. [X] Seed fixed taxonomy (categories + skills) and CV templates
 6. [ ] Configure NextAuth v5 (email + GitHub + Google)
-7. [X] Implement Skill Bank CRUD (skills, experience, certifications, projects)
-8. [X] Implement Job Posts CRUD (paste + structured requirements)
+7. [ ] Implement Skill Bank CRUD (skills, experience, certifications, projects)
+8. [ ] Implement Job Posts CRUD (paste + structured requirements)
 9. [ ] Build the deterministic comparison / gap engine
 10. [ ] Implement CVs: generation (curated from Experience/Project entries, ranked by skill-match against the job post), editor, autosave, versioning
 11. [ ] Set up Cloudflare R2 + CV PDF/DOC rendering (lazy per version)
