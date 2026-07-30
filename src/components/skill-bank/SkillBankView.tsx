@@ -5,7 +5,6 @@ import { CircleAlert, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, ProLockBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { mockUser } from "@/lib/mock-data";
 import type { SkillBankData, SkillBankEntryView } from "@/lib/skill-bank-data";
 import { CategoryTabs } from "./CategoryTabs";
 import { SkillTable } from "./SkillTable";
@@ -25,11 +24,12 @@ function makeLocalId(prefix: string) {
 interface SkillBankViewProps {
   data: SkillBankData;
   initialCategorySlug: string;
+  isPro: boolean;
 }
 
 type PanelState = { mode: "add" | "edit"; entry?: SkillBankEntryView } | null;
 
-export function SkillBankView({ data, initialCategorySlug }: SkillBankViewProps) {
+export function SkillBankView({ data, initialCategorySlug, isPro }: SkillBankViewProps) {
   const initialCategory = data.categories.find((c) => c.slug === initialCategorySlug) ?? data.categories[0];
 
   const [status, setStatus] = React.useState<"loading" | "error" | "ready">("loading");
@@ -187,7 +187,7 @@ export function SkillBankView({ data, initialCategorySlug }: SkillBankViewProps)
             <div className="flex min-h-0 flex-1 flex-col gap-6 lg:flex-row">
               <SkillTable
                 entries={categoryEntries}
-                showProUpsell={!mockUser.isPro}
+                showProUpsell={!isPro}
                 onRowClick={handleRowClick}
                 onDeleteClick={setDeleteTarget}
                 onAddClick={handleAddClick}
