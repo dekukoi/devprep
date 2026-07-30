@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/layout";
 import { ProjectsBankView } from "@/components/projects";
 import { getAppShellData } from "@/lib/app-shell-data";
-import { getProjectsData } from "@/lib/projects-data";
+import { getProjectsData } from "@/lib/db/projects";
 
 interface ProjectsPageProps {
   searchParams: Promise<{ experienceId?: string }>;
@@ -10,7 +10,7 @@ interface ProjectsPageProps {
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
   const { experienceId } = await searchParams;
   const shellData = getAppShellData();
-  const data = getProjectsData();
+  const data = await getProjectsData();
 
   return (
     <AppShell {...shellData}>
