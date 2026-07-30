@@ -83,10 +83,7 @@ export function AppShell({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [drawerVisible]);
 
-  const handleMenuClick = () => {
-    if (isDesktop) setCollapsed((v) => !v);
-    else setDrawerOpen((v) => !v);
-  };
+  const handleMenuClick = () => setDrawerOpen((v) => !v);
 
   const handleMarkAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
@@ -112,6 +109,7 @@ export function AppShell({
           cvs={cvs}
           collapsed={collapsed}
           onExpand={() => setCollapsed(false)}
+          onCollapse={() => setCollapsed(true)}
         />
 
         {drawerVisible && (
@@ -120,9 +118,9 @@ export function AppShell({
               type="button"
               aria-label="Close menu"
               onClick={() => setDrawerOpen(false)}
-              className="absolute inset-0 bg-black/70"
+              className="absolute inset-0 bg-black/70 animate-in fade-in-0 duration-200"
             />
-            <div className="absolute inset-y-0 left-0 flex w-[280px] flex-col overflow-hidden shadow-[4px_0_24px_#00000080]">
+            <div className="absolute inset-y-0 left-0 flex w-[280px] flex-col overflow-hidden shadow-[4px_0_24px_#00000080] animate-in slide-in-from-left duration-300 ease-out">
               <div className="flex h-[60px] shrink-0 items-center justify-between border-b border-border-subtle bg-bg-surface px-4">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setDrawerOpen(false)}>
                   <span className="flex size-6 items-center justify-center rounded-md bg-accent">

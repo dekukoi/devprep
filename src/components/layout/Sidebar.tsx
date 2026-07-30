@@ -8,6 +8,7 @@ import {
   FileText,
   FileUser,
   FolderKanban,
+  PanelLeftClose,
   PanelLeftOpen,
   Plus,
   Terminal,
@@ -34,6 +35,7 @@ interface SidebarProps {
   cvs: SidebarLinkItem[];
   collapsed?: boolean;
   onExpand?: () => void;
+  onCollapse?: () => void;
   onAddJobPost?: () => void;
   onAddCv?: () => void;
   onNavigate?: () => void;
@@ -161,6 +163,7 @@ export function Sidebar({
   cvs,
   collapsed = false,
   onExpand,
+  onCollapse,
   onAddJobPost,
   onAddCv,
   onNavigate,
@@ -169,159 +172,171 @@ export function Sidebar({
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
-  if (collapsed) {
-    return (
-      <aside
-        className={cn(
-          "flex h-full w-20 flex-col gap-5 border-r border-border-subtle bg-bg-surface p-3",
-          className,
-        )}
-      >
-        <div className="flex size-9 items-center justify-center rounded-lg bg-accent">
-          <Terminal className="size-4 text-white" />
-        </div>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={onExpand}
-              aria-label="Expand sidebar"
-              className="flex h-8 w-full items-center justify-center rounded-sm border-2 border-accent bg-bg-surface-2 text-text-secondary transition-colors hover:text-text-primary"
-            >
-              <PanelLeftOpen className="size-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="right">Expand sidebar</TooltipContent>
-        </Tooltip>
-
-        <div className="flex flex-col gap-0.5">
-          {skillCategories.map((cat) => {
-            const href = `/skill-bank/${slugify(cat.label)}`;
-            const Icon = SKILL_CATEGORY_ICONS[cat.label];
-            return (
-              <CollapsedIconButton
-                key={cat.id}
-                href={href}
-                label={cat.label}
-                icon={Icon}
-                active={isActive(href)}
-                onClick={onNavigate}
-              />
-            );
-          })}
-        </div>
-
-        <div className="h-px bg-border-subtle" />
-
-        <div className="flex flex-col gap-0.5">
-          <CollapsedIconButton href="/job-posts" label="Job Posts" icon={FileText} active={isActive("/job-posts")} onClick={onNavigate} />
-          <CollapsedIconButton href="/cvs" label="CVs" icon={FileUser} active={isActive("/cvs")} onClick={onNavigate} />
-        </div>
-
-        <div className="h-px bg-border-subtle" />
-
-        <div className="flex flex-col gap-0.5">
-          {CAREER_ITEMS.map((item) => (
-            <CollapsedIconButton
-              key={item.id}
-              href={item.href}
-              label={item.label}
-              icon={item.icon}
-              active={isActive(item.href)}
-              onClick={onNavigate}
-            />
-          ))}
-        </div>
-      </aside>
-    );
-  }
-
   return (
     <aside
       className={cn(
-        "flex h-full w-[264px] flex-col gap-5 overflow-y-auto border-r border-border-subtle bg-bg-surface p-3",
+        "flex h-full flex-col overflow-hidden border-r border-border-subtle bg-bg-surface p-3 transition-[width] duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-[264px]",
         className,
       )}
     >
-      <div className="flex flex-col gap-1">
-        <SectionHeader>Skill Bank</SectionHeader>
-        <div className="flex flex-col gap-0.5">
-          {skillCategories.map((cat) => {
-            const href = `/skill-bank/${slugify(cat.label)}`;
-            return (
-              <NavItem
-                key={cat.id}
-                href={href}
-                label={cat.label}
-                icon={SKILL_CATEGORY_ICONS[cat.label]}
-                active={isActive(href)}
+      {collapsed ? (
+        <div key="collapsed" className="flex h-full flex-col gap-5 animate-in fade-in-0 duration-200">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-accent">
+            <Terminal className="size-4 text-white" />
+          </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={onExpand}
+                aria-label="Expand sidebar"
+                className="flex h-8 w-full items-center justify-center rounded-sm border-2 border-accent bg-bg-surface-2 text-text-secondary transition-colors hover:text-text-primary"
+              >
+                <PanelLeftOpen className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Expand sidebar</TooltipContent>
+          </Tooltip>
+
+          <div className="flex flex-col gap-0.5">
+            {skillCategories.map((cat) => {
+              const href = `/skill-bank/${slugify(cat.label)}`;
+              const Icon = SKILL_CATEGORY_ICONS[cat.label];
+              return (
+                <CollapsedIconButton
+                  key={cat.id}
+                  href={href}
+                  label={cat.label}
+                  icon={Icon}
+                  active={isActive(href)}
+                  onClick={onNavigate}
+                />
+              );
+            })}
+          </div>
+
+          <div className="h-px bg-border-subtle" />
+
+          <div className="flex flex-col gap-0.5">
+            <CollapsedIconButton href="/job-posts" label="Job Posts" icon={FileText} active={isActive("/job-posts")} onClick={onNavigate} />
+            <CollapsedIconButton href="/cvs" label="CVs" icon={FileUser} active={isActive("/cvs")} onClick={onNavigate} />
+          </div>
+
+          <div className="h-px bg-border-subtle" />
+
+          <div className="flex flex-col gap-0.5">
+            {CAREER_ITEMS.map((item) => (
+              <CollapsedIconButton
+                key={item.id}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                active={isActive(item.href)}
                 onClick={onNavigate}
-                trailing={<CountBadge count={cat.count} />}
               />
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="h-px bg-border-subtle" />
-
-      <div className="flex flex-col gap-2">
-        <SectionHeader
-          action={
-            <div className="flex items-center gap-1.5">
-              <CountBadge count={jobPosts.length} />
-              <AddButton label="Add job post" onClick={onAddJobPost} />
-            </div>
-          }
-        >
-          Job Posts
-        </SectionHeader>
-        {jobPosts.length === 0 ? (
-          <EmptyAddPrompt label="Add Job Post" onClick={onAddJobPost} />
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            {jobPosts.map((job) => (
-              <NavItem key={job.id} href={`/job-posts/${job.id}`} label={job.label} icon={FileText} active={isActive(`/job-posts/${job.id}`)} onClick={onNavigate} />
             ))}
           </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border-subtle" />
-
-      <div className="flex flex-col gap-2">
-        <SectionHeader
-          action={
-            <div className="flex items-center gap-1.5">
-              <CountBadge count={cvs.length} />
-              <AddButton label="Add CV" onClick={onAddCv} />
-            </div>
-          }
-        >
-          CVs
-        </SectionHeader>
-        {cvs.length === 0 ? (
-          <EmptyAddPrompt label="Add CV" onClick={onAddCv} />
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            {cvs.map((cv) => (
-              <NavItem key={cv.id} href={`/cvs/${cv.id}/edit`} label={cv.label} icon={FileUser} active={isActive(`/cvs/${cv.id}`)} onClick={onNavigate} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border-subtle" />
-
-      <div className="flex flex-col gap-1">
-        <SectionHeader>Career</SectionHeader>
-        <div className="flex flex-col gap-0.5">
-          {CAREER_ITEMS.map((item) => (
-            <NavItem key={item.id} href={item.href} label={item.label} icon={item.icon} active={isActive(item.href)} onClick={onNavigate} />
-          ))}
         </div>
-      </div>
+      ) : (
+        <div key="expanded" className="flex h-full min-h-0 flex-col gap-5 overflow-y-auto animate-in fade-in-0 duration-200">
+          {onCollapse && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={onCollapse}
+                  aria-label="Collapse sidebar"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-sm border-2 border-accent bg-bg-surface-2 text-text-secondary transition-colors hover:text-text-primary"
+                >
+                  <PanelLeftClose className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Collapse sidebar</TooltipContent>
+            </Tooltip>
+          )}
+
+          <div className="flex flex-col gap-1">
+            <SectionHeader>Skill Bank</SectionHeader>
+            <div className="flex flex-col gap-0.5">
+              {skillCategories.map((cat) => {
+                const href = `/skill-bank/${slugify(cat.label)}`;
+                return (
+                  <NavItem
+                    key={cat.id}
+                    href={href}
+                    label={cat.label}
+                    icon={SKILL_CATEGORY_ICONS[cat.label]}
+                    active={isActive(href)}
+                    onClick={onNavigate}
+                    trailing={<CountBadge count={cat.count} />}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="h-px bg-border-subtle" />
+
+          <div className="flex flex-col gap-2">
+            <SectionHeader
+              action={
+                <div className="flex items-center gap-1.5">
+                  <CountBadge count={jobPosts.length} />
+                  <AddButton label="Add job post" onClick={onAddJobPost} />
+                </div>
+              }
+            >
+              Job Posts
+            </SectionHeader>
+            {jobPosts.length === 0 ? (
+              <EmptyAddPrompt label="Add Job Post" onClick={onAddJobPost} />
+            ) : (
+              <div className="flex flex-col gap-0.5">
+                {jobPosts.map((job) => (
+                  <NavItem key={job.id} href={`/job-posts/${job.id}`} label={job.label} icon={FileText} active={isActive(`/job-posts/${job.id}`)} onClick={onNavigate} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="h-px bg-border-subtle" />
+
+          <div className="flex flex-col gap-2">
+            <SectionHeader
+              action={
+                <div className="flex items-center gap-1.5">
+                  <CountBadge count={cvs.length} />
+                  <AddButton label="Add CV" onClick={onAddCv} />
+                </div>
+              }
+            >
+              CVs
+            </SectionHeader>
+            {cvs.length === 0 ? (
+              <EmptyAddPrompt label="Add CV" onClick={onAddCv} />
+            ) : (
+              <div className="flex flex-col gap-0.5">
+                {cvs.map((cv) => (
+                  <NavItem key={cv.id} href={`/cvs/${cv.id}/edit`} label={cv.label} icon={FileUser} active={isActive(`/cvs/${cv.id}`)} onClick={onNavigate} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="h-px bg-border-subtle" />
+
+          <div className="flex flex-col gap-1">
+            <SectionHeader>Career</SectionHeader>
+            <div className="flex flex-col gap-0.5">
+              {CAREER_ITEMS.map((item) => (
+                <NavItem key={item.id} href={item.href} label={item.label} icon={item.icon} active={isActive(item.href)} onClick={onNavigate} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
