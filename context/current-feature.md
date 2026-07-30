@@ -1,12 +1,19 @@
 # Current Feature
 <!-- Feature name and short description -->
 
-Screen — Certifications — build the `Screen — Certifications` frame end-to-end per `context/designs/10-certifications.md` (using `context/designs/devprep-design.pen` as the source of truth for visuals) — a simple CRUD list for certifications, the last remaining unbuilt Career-section screen (Experience and Projects are both already built; the Sidebar already links to `/certifications`).
+Screen — Comparisons (list) — build a `/comparisons` index route: a full list of every comparison ever run, fixing a real 404 (Dashboard's "Total comparisons"/"Average fit" stat tiles and "View all" all link to bare `/comparisons`, which only ever had the `[id]` detail route). No Pencil frame exists for this screen — `context/designs/02-dashboard.md` and `context/designs/README.md` both flag a "full Comparisons list" screen as a known, never-designed gap — so this is designed from scratch against `context/designs/00-general.md`'s rules, reusing this project's own established list-page conventions (Job Posts' list-panel pattern, Dashboard's `ScoreRing`/`RecentComparisonCard` styling).
 
 ## Status
 <!-- Not Started | In Progress | Completed -->
 
 Completed
+
+## Goals (Comparisons List)
+- A full-width list of every comparison (all mock `Comparison` records joined to their `JobPost`), newest first by default.
+- Search (company/role) + sort chips (Fit % / Date added / Company), matching Job Posts' list-panel pattern.
+- Each row: company/role, a small `ScoreRing`, top-gap chip, relative date — clicking navigates to the existing `/comparisons/[id]` report.
+- A "New comparison" action (reusing the existing `NewComparisonModal`) so the list isn't a dead end.
+- Empty ("No comparisons yet" + CTA), Loading (skeleton), Error (retry) states per `00-general.md`.
 
 ## Goals (Certifications)
 - A list of certification cards — name, issuer, issue date, expiry date (or "No expiry"), a small "Expiring soon"/"Expired" badge when relevant (amber/red, matching the existing severity palette), and skill chips if any are linked.
