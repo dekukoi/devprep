@@ -15,6 +15,12 @@ export interface CVContentExperience {
   bullets: string[];
 }
 
+export interface CVContentProject {
+  title: string;
+  dateRange: string | null;
+  bullets: string[];
+}
+
 export interface CVContent {
   name: string;
   role: string;
@@ -24,6 +30,8 @@ export interface CVContent {
   links: string[];
   summary: string;
   experience: CVContentExperience[];
+  /** Curated Project entries included in this draft, e.g. via the CV Curate Content step. Absent on older/hand-authored CVs. */
+  projects?: CVContentProject[];
   skills: string[];
 }
 

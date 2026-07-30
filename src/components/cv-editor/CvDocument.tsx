@@ -221,6 +221,30 @@ export function CvDocument({
         })}
       </div>
 
+      {content.projects && content.projects.length > 0 && (
+        <div className="flex w-full shrink-0 flex-col gap-3.5">
+          <div className="text-xs font-bold tracking-[1px] text-[#9CA3AF]">PROJECTS</div>
+          {content.projects.map((project, projectIndex) => (
+            <div key={`${project.title}-${projectIndex}`} className="flex w-full shrink-0 flex-col gap-1.5">
+              <div className="flex w-full shrink-0 items-start justify-between">
+                <span className="text-sm font-semibold text-[#111827]">{project.title}</span>
+                {project.dateRange && (
+                  <span className="shrink-0 text-xs whitespace-nowrap text-[#9CA3AF]">{project.dateRange}</span>
+                )}
+              </div>
+              <div className="flex w-full shrink-0 flex-col gap-1">
+                {project.bullets.map((bullet, bulletIndex) => (
+                  <div key={bulletIndex} className="flex w-full items-start gap-2">
+                    <span className="mt-[7px] size-1 shrink-0 rounded-full bg-[#9CA3AF]" />
+                    <span className="flex-1 text-[12.5px] leading-[18px] text-[#374151]">{bullet}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="relative flex w-full shrink-0 flex-col gap-2">
         <div className="text-xs font-bold tracking-[1px] text-[#9CA3AF]">SKILLS</div>
         <div className="flex w-full flex-wrap gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { FilterPill, PageHeader } from "@/components/shared";
 import { FREE_TEMPLATE_ID, TEMPLATE_FAMILY } from "@/lib/constants/cv-templates";
@@ -20,9 +21,12 @@ export interface CvTemplatePickerCv {
 interface CvTemplatePickerViewProps {
   templates: CVTemplate[];
   cv: CvTemplatePickerCv | null;
+  /** Present when reached from "Generate CV for this role" — routes straight into the Curate Content step after picking a template. */
+  jobPostId?: string;
 }
 
-export function CvTemplatePickerView({ templates, cv }: CvTemplatePickerViewProps) {
+export function CvTemplatePickerView({ templates, cv, jobPostId }: CvTemplatePickerViewProps) {
+  const router = useRouter();
   const isRetemplate = cv !== null;
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]>("All");
   const [selectedTemplateId, setSelectedTemplateId] = React.useState(cv?.templateId ?? FREE_TEMPLATE_ID);
@@ -35,6 +39,10 @@ export function CvTemplatePickerView({ templates, cv }: CvTemplatePickerViewProp
   const matchesFilter = (template: CVTemplate) => filter === "All" || TEMPLATE_FAMILY[template.name] === filter;
 
   const applyTemplate = (template: CVTemplate) => {
+    if (!isRetemplate && jobPostId) {
+      router.push(`/cvs/curate?jobPostId=${jobPostId}&templateId=${template.id}`);
+      return;
+    }
     setSelectedTemplateId(template.id);
     toast.success("Template applied to CV");
   };
