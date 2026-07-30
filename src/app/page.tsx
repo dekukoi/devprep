@@ -1,28 +1,14 @@
 import { AppShell } from "@/components/layout";
 import { DashboardView, type DashboardCvItem } from "@/components/dashboard";
-import type { RecentComparisonCardData } from "@/components/dashboard/RecentComparisonCard";
-import type { NewComparisonJobPost } from "@/components/dashboard/NewComparisonModal";
 import { getAppShellData } from "@/lib/app-shell-data";
 import { formatRelativeDate } from "@/lib/format";
-import { comparisons, cvs, cvVersions, dashboardStats, jobPosts } from "@/lib/mock-data";
+import { getComparisonIdByJobId, getComparisonsListData, getNewComparisonJobPosts } from "@/lib/comparisons-list-data";
+import { cvs, cvVersions, dashboardStats, jobPosts } from "@/lib/mock-data";
 
 export default function Home() {
   const shellData = getAppShellData();
 
-  const dashboardComparisons: RecentComparisonCardData[] = [...comparisons]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .map((comparison) => {
-      const job = jobPosts.find((j) => j.id === comparison.jobPostId);
-      const topGap = comparison.gaps.find((g) => g.severity !== "met") ?? comparison.gaps[0] ?? null;
-      return {
-        id: comparison.id,
-        company: job?.company ?? job?.title ?? "Unknown",
-        role: job?.title ?? "",
-        fitScore: comparison.fitScore,
-        createdAt: comparison.createdAt,
-        topGapLabel: topGap?.skillName ?? null,
-      };
-    });
+  const dashboardComparisons = getComparisonsListData();
 
   const dashboardCvs: DashboardCvItem[] = cvs.map((cv) => {
     const job = jobPosts.find((j) => j.id === cv.jobPostId);
@@ -38,15 +24,8 @@ export default function Home() {
     };
   });
 
-  const dashboardJobPosts: NewComparisonJobPost[] = jobPosts.map((job) => ({
-    id: job.id,
-    company: job.company ?? job.title,
-    role: job.title,
-  }));
-
-  const comparisonIdByJobId: Record<string, string> = Object.fromEntries(
-    comparisons.map((c) => [c.jobPostId, c.id]),
-  );
+  const dashboardJobPosts = getNewComparisonJobPosts();
+  const comparisonIdByJobId = getComparisonIdByJobId();
 
   return (
     <AppShell {...shellData}>
