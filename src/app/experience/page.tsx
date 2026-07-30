@@ -1,11 +1,11 @@
 import { AppShell } from "@/components/layout";
 import { ExperienceBankView } from "@/components/experience";
 import { getAppShellData } from "@/lib/app-shell-data";
-import { getExperienceData } from "@/lib/experience-data";
+import { getExperienceData } from "@/lib/db/experience";
 
-export default function ExperiencePage() {
+export default async function ExperiencePage() {
   const shellData = getAppShellData();
-  const data = getExperienceData();
+  const data = await getExperienceData();
 
   return (
     <AppShell {...shellData}>
