@@ -21,3 +21,17 @@ Read the following to get the full context of the project:
 - `npm run lint` — ESLint via the flat config in `eslint.config.mjs`
 
 There is no test suite configured in this project yet.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as markdown files under `.scratch/<feature-slug>/` in this repo. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, recorded as a `Status:` line in each issue file (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` + `docs/adr/` at the repo root, created lazily by `/domain-modeling`. See `docs/agents/domain.md`.
