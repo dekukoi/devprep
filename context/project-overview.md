@@ -951,12 +951,12 @@ devprep/
 
 ## 🚀 Next Steps
 
-1. [ ] Initialize Next.js 16 project with TypeScript
-2. [ ] Set up Prisma with Neon PostgreSQL
-3. [ ] Configure NextAuth v5 (email + GitHub + Google)
-4. [ ] Create database migrations for initial schema
-5. [ ] Seed fixed taxonomy (categories + skills) and CV templates
-6. [ ] Build core UI components with shadcn/ui
+1. [X] Initialize Next.js 16 project with TypeScript
+2. [X] Set up Prisma with Neon PostgreSQL
+3. [X] Create database migrations for initial schema
+4. [X] Build core UI components with shadcn/ui
+5. [X] Seed fixed taxonomy (categories + skills) and CV templates
+6. [ ] Configure NextAuth v5 (email + GitHub + Google)
 7. [ ] Implement Skill Bank CRUD (skills, experience, certifications, projects)
 8. [ ] Implement Job Posts CRUD (paste + structured requirements)
 9. [ ] Build the deterministic comparison / gap engine
@@ -967,6 +967,7 @@ devprep/
 14. [ ] Implement usage limits for the free tier
 15. [ ] Testing & polish
 16. [ ] Deploy to production
+17. [ ] Add a deterministic "bullet impact quality" signal (quantified / action-only / vague, derived from `Experience.bullets` / `Project.bullets` text) surfaced as: a badge on Experience/Project cards, a tiebreaker in CV Curate Content ranking, and a new advice category in the Comparison Report's rule-based advice (alongside skill-gap advice) — backlogged behind items 7–9; AI bullet rewriter (item 13) should target this same gap once built, not just job-post tone-matching
 
 ---
 

@@ -23,10 +23,10 @@ These come from the screen audit done after the first Pencil pass (see git histo
 | `05-comparison-report.md` | `Screen — Comparison Report` |
 | `06-cv-template-picker.md` | `Screen — CV Template Picker` |
 | `07-cv-editor.md` | `Screen — CV Editor` |
-| `08-experience-bank.md` | none yet — new frame |
-| `09-projects-bank.md` | none yet — new frame |
-| `10-certifications.md` | none yet — new frame |
-| `11-cv-curate-content.md` | none yet — new frame, sits between `06` and `07` |
+| `08-experience-bank.md` | `Screen — Experience Bank` |
+| `09-projects-bank.md` | `Screen — Projects Bank` |
+| `10-certifications.md` | `Screen — Certifications` |
+| `11-cv-curate-content.md` | `Screen — CV Curate Content` |
 
 Files `01`–`07` ask Pencil to *finish* an existing mocked frame. Files `08`–`11` ask Pencil to *design from scratch* — these came out of a follow-up discussion (see the plan doc referenced below) that found CVs were spec'd to pull content from the Skill Bank, but the Skill Bank has no narrative content (just proficiency ratings) — the real content lives in Experience and a new `Project` entity, neither of which had a screen yet. `context/project-overview.md`'s data model and Feature A/B text were updated to match (added a `Project` model, corrected how CV generation is described).
 

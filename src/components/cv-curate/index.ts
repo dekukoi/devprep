@@ -1,0 +1,1 @@
+export { CvCurateContentView } from "./CvCurateContentView";

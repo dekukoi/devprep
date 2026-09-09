@@ -6,6 +6,10 @@ export interface JobPost {
   title: string;
   company: string | null;
   content: string;
+  seniority?: string | null;
+  location?: string | null;
+  employmentType?: string | null;
+  salaryRange?: string | null;
   createdAt: string;
 }
 
@@ -14,5 +18,12 @@ export interface JobPostRequirement {
   jobPostId: string;
   skillId: string;
   requiredLevel: ProficiencyLevel;
+  mustHave: boolean;
   weight: number | null;
+}
+
+export interface UnresolvedRequirement {
+  id: string;
+  jobPostId: string;
+  phrase: string;
 }

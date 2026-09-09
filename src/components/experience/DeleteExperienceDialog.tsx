@@ -1,0 +1,60 @@
+import { TriangleAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+
+interface DeleteExperienceDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  roleLabel: string;
+  linkedProjectCount: number;
+  onConfirm: () => void;
+}
+
+export function DeleteExperienceDialog({
+  open,
+  onOpenChange,
+  roleLabel,
+  linkedProjectCount,
+  onConfirm,
+}: DeleteExperienceDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex w-[420px] flex-col gap-4 p-5">
+        <span className="flex size-9 items-center justify-center rounded-full bg-[#7F1D1D33]">
+          <TriangleAlert className="size-[18px] text-sev-missing" />
+        </span>
+        <div className="flex flex-col gap-1.5">
+          <DialogTitle className="text-base">Delete this experience?</DialogTitle>
+          <DialogDescription>
+            This will remove &ldquo;{roleLabel}&rdquo; from your Experience Bank. It will no longer factor into gap
+            analysis or CV generation.
+            {linkedProjectCount > 0 && (
+              <>
+                {" "}
+                {linkedProjectCount} linked project{linkedProjectCount === 1 ? "" : "s"}
+                {" "}won&rsquo;t be deleted, but will no longer be linked to this role.
+              </>
+            )}{" "}
+            This can&rsquo;t be undone.
+          </DialogDescription>
+        </div>
+        <div className="flex justify-end gap-2.5">
+          <DialogClose asChild>
+            <Button variant="secondary" className="border border-border-strong">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button
+            className="bg-sev-missing text-white hover:bg-sev-missing/90"
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

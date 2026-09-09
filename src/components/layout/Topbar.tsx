@@ -193,7 +193,7 @@ export function Topbar({
       )}
     >
       <div className="flex items-center gap-3 lg:gap-6">
-        <IconButton icon={Menu} label="Toggle sidebar" onClick={onMenuClick} />
+        <IconButton icon={Menu} label="Toggle sidebar" onClick={onMenuClick} className="lg:hidden" />
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex size-7 items-center justify-center rounded-lg bg-accent">
             <Terminal className="size-4 text-white" />
